@@ -8,7 +8,6 @@ from cv_bridge import CvBridge
 def operator():
     rospy.init_node("operator",anonymous=True)
     pub=rospy.Publisher("/usb_cam/image_raw",Image,queue_size=1)
-    rate=rospy.Rate(1)
 
     #read image
     filename="bus.jpg"
@@ -25,13 +24,12 @@ def operator():
     msg=bridge.cv2_to_imgmsg(im,encoding="bgr8")
 
 
-    rate=rospy.Rate(10) #1hz
+    rate=rospy.Rate(10)
     while not rospy.is_shutdown():
-        pub.publish(msg)
         pub.publish(msg)
         rate.sleep()
         print("published")
-        input()
+        #input()
 
 if __name__ == "__main__":
     try:

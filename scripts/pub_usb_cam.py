@@ -8,8 +8,8 @@ def publish_camera_image():
     rospy.init_node('camera_publisher')
     camera = cv2.VideoCapture(0)
     bridge = CvBridge()
-    pub = rospy.Publisher('/image_data', CompressedImage, queue_size=10)
-    rate = rospy.Rate(1) # 30Hz
+    pub = rospy.Publisher('/usb_cam/image_raw', CompressedImage, queue_size=1)
+    rate = rospy.Rate(3) # 30Hz
 
     while not rospy.is_shutdown():
         ret, frame = camera.read()
@@ -20,7 +20,7 @@ def publish_camera_image():
         # Convert the OpenCV image to ROS message and publish it
         msg = bridge.cv2_to_compressed_imgmsg(frame)
         pub.publish(msg)
-
+        print("published")
         rate.sleep()
 
     camera.release()

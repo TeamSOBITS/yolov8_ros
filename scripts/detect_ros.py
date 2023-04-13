@@ -9,12 +9,13 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
 from sobit_common_msg.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
 from sobit_common_msg.srv import RunCtrl, RunCtrlResponse
-# from ultralytics.yolo.utils.plotting import Annotator, colors
+from ultralytics.yolo.utils.plotting import Annotator, colors
 # from ultralytics.yolo.data.augment import LetterBox
 # from ultralytics.yolo.utils.checks import check_imgsz, check_requirements
 # from ultralytics.yolo.utils import ops
 # from ultralytics.yolo.engine.model import DetectionModel
 # from copy import deepcopy
+import datetime
 
 class Yolov8Detector:
     def __init__(self):
@@ -23,6 +24,7 @@ class Yolov8Detector:
         self.publish_image = rospy.get_param("~publish_image")
         self.view_image = rospy.get_param("~view_image")
         self.save_image = rospy.get_param("~save_image")
+        self.conf = rospy.get_param("~conf")
 
         #Define publishers
         self.pub_result_img = rospy.Publisher("detect_result", Image, queue_size=10) #結果画像
@@ -34,7 +36,7 @@ class Yolov8Detector:
 
         #Set Inference size
         #height, weight = 
-        self.img_size = [rospy.get_param("~inference_size_w", 640), rospy.get_param("~inference_size_h", 480)]
+        self.img_size = [rospy.get_param("~inference_size_w", 1280), rospy.get_param("~inference_size_h", 720)]
         #self.img_size = check_imgsz(self.img_size, s = self.stride)
 
         #Start Run_control Service(???????????????)
@@ -66,16 +68,22 @@ class Yolov8Detector:
         self.can_predict = msg.data
         rospy.loginfo("run ctrl -> {}".format(self.can_predict))
 
-    #CALLBACK (when Subscribing a Image Publish)
+    #####CALLBACK (when Subscribing a Image Publish)#########
     def callback(self,msg):
         if not self.can_predict:
             return
     
+        rate = rospy.Rate(30)
+
         #subscribe images and conversion to bgr
         self.bridge = CvBridge()
         cv_array=np.ndarray
         #cv_array = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-        cv_array = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        if not self.compressed_input:
+            cv_array = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        else:
+            cv_array = self.bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
+
 
         #np.ndarray型で渡すとvisualizeができないので、cv2.imwriteしてから、predict()に保存パスを渡します
         #多分home/<user名>/.ros/yolov8_image.jpgが出力されます
@@ -84,7 +92,7 @@ class Yolov8Detector:
 
         #Do the predict with YOLOv8 (ultralytics)
         self.model = YOLO("yolov8n.pt")
-        self.result = self.model.predict("yolov8_image.jpg", show=self.view_image, save=self.save_image, stream=False)
+        self.result = self.model.predict("yolov8_image.jpg", show=self.view_image, save=self.save_image, conf=self.conf)
         #self.result = self.model.predict(0, show=self.view_image) #USBcamera用
         self.boxes = self.result[0].numpy().boxes #検出した全BBox
         self.names = self.result[0].names #モデルの全ラベル一覧
@@ -111,6 +119,37 @@ class Yolov8Detector:
             label = f"{bounding_box.Class} {bounding_box.probability:.2f}"
             detect_list.data.append(label)
 
+            #generate result image
+            img_result = cv_array
+            (w, h), baseline = cv2.getTextSize(label,
+                                       fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                                       fontScale=0.5,
+                                       thickness=1)
+            cv2.rectangle(img_result,
+                          pt1=(int(box.xyxy[0][0]),int(box.xyxy[0][1])),
+                          pt2=(int(box.xyxy[0][2]),int(box.xyxy[0][3])),
+                          color=colors(c, True),
+                          thickness=2,
+                          lineType=cv2.LINE_4)
+            cv2.rectangle(img_result,
+                          pt1=(int(box.xyxy[0][0]), int(box.xyxy[0][1]) - h),
+                          pt2=(int(box.xyxy[0][0]) + w, int(box.xyxy[0][1])),
+                          color=colors(c, True),
+                          thickness=-1,
+                          lineType=cv2.LINE_4)
+            cv2.putText(img_result,
+                        text=label,
+                        org=(int(box.xyxy[0][0]),int(box.xyxy[0][1])),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=0.5,
+                        color=(255,255,255),
+                        thickness=1,
+                        lineType=cv2.LINE_AA)
+            #publish result image
+            img_result = self.bridge.cv2_to_imgmsg(img_result, "bgr8")
+            self.pub_result_img.publish(img_result)
+
+
             #Fill detect_poses
             obj_pose = ObjectPose()
             obj_pose.Class = label
@@ -123,6 +162,8 @@ class Yolov8Detector:
         detect_poses.header = msg.header
 
         #Publish PREDICTION
+        time = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')[:-3]
+        print(time)
         self.pub_prediction.publish(bounding_boxes)
         try:
             self.pub_detect_poses.publish(detect_poses)

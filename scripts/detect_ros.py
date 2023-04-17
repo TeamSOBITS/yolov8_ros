@@ -25,7 +25,7 @@ class Yolov8Detector:
         self.view_image = rospy.get_param("~view_image")
         self.save_image = rospy.get_param("~save_image")
         self.conf = rospy.get_param("~conf")
-
+        
         #Define publishers
         self.pub_result_img = rospy.Publisher("detect_result", Image, queue_size=10) #結果画像
         self.pub_detect_list = rospy.Publisher("detect_list", StringArray, queue_size=10) #Label list (class conf)

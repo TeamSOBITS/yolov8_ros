@@ -19,6 +19,7 @@
 
     <!-- ROS TOPIC-->
     <arg name="input_image_topic" default="/usb_cam/image_raw"/>
+    <arg name ="output_topic_bb" default="objects_rect"/>
     <!--arg name="input_image_topic" default="/usb_cam/image_raw"/-->
     <!-- <arg name="input_image_topic" default="/rgb/image_raw"/> -->
     <!-- <arg name="input_image_topic" default="/camera/color/image_raw"/> -->
@@ -37,6 +38,7 @@
         <param name="save_image" value="$(arg save_image)"/>
 
         <param name="publish_image" type="bool" value="$(arg publish_image)"/>
+        <param name="output_topic_bb" value="$(arg output_topic_bb)"/>
         <param name="output_image_topic" value="$(arg output_image_topic)"/>
 
         <param name="initial_predict" type="bool" value="True"/>

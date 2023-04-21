@@ -25,12 +25,13 @@ class Yolov8Detector:
         self.view_image = rospy.get_param("~view_image")
         self.save_image = rospy.get_param("~save_image")
         self.conf = rospy.get_param("~conf")
+        self.output_topic_bb = rospy.get_param("~output_topic_bb")
         
         #Define publishers
         self.pub_result_img = rospy.Publisher("detect_result", Image, queue_size=10) #結果画像
         self.pub_detect_list = rospy.Publisher("detect_list", StringArray, queue_size=10) #Label list (class conf)
-        self.pub_detect_poses = rospy.Publisher("detect_poses", ObjectPoseArray, queue_size=10) #center xy(normalized)
-        self.pub_prediction = rospy.Publisher("output_topic", BoundingBoxes, queue_size=10) #BBox (xywh_normalized)
+        self.pub_detect_poses = rospy.Publisher("detect_poses", ObjectPoseArray, queue_size=10) #center xy(NOTnormalized)
+        self.pub_prediction = rospy.Publisher(self.output_topic_bb, BoundingBoxes, queue_size=10) #BBox (xywh_NOTnormalized)
         self.pub_image = rospy.Publisher("image_pub", Image, queue_size=10) #subscribed Image
         print("publisher defined")
 
@@ -105,10 +106,10 @@ class Yolov8Detector:
             c = int(box.cls[0]) #object number (int)
             bounding_box.Class = self.names[c] #object name (char)
             bounding_box.probability = box.conf[0] #Confidence
-            bounding_box.xmin = box.xyxyn[0][0] #Xmin normalized 0-1
-            bounding_box.ymin = box.xyxyn[0][1] #Ymin normalized 0-1
-            bounding_box.xmax = box.xyxyn[0][2] #Xmax normalized 0-1
-            bounding_box.ymax = box.xyxyn[0][3] #Ymax normalized 0-1
+            bounding_box.xmin = int(box.xyxy[0][0]) #Xmin NOT normalized 0-1
+            bounding_box.ymin = int(box.xyxy[0][1]) #Ymin NOT normalized 0-1
+            bounding_box.xmax = int(box.xyxy[0][2]) #Xmax NOT normalized 0-1
+            bounding_box.ymax = int(box.xyxy[0][3]) #Ymax NOT normalized 0-1
 
             bounding_boxes = BoundingBoxes()
             bounding_boxes.header = msg.header

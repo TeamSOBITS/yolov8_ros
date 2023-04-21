@@ -1,0 +1,58 @@
+<launch>
+    <group ns = "yolov8_ros">
+        <arg name="weights" default="WEIGHT_NAME"/>
+        <arg name="conf" default="0.3"/>
+
+        <!-- replace imgsz -->
+        <arg name="inference_size_h" default="640"/>
+        <arg name="inference_size_w" default="480"/>
+
+        <!-- Visualize using OpenCV window -->
+        <arg name="view_image" default="false"/>
+
+        <!-- Save result images using YOLOv8: save-option -->
+        <!-- the images will be saved to /home/<user>/.ros -->
+        <arg name="save_image" default="false"/>
+
+        <!-- Optional topic (publishing annotated image) -->
+        <arg name="publish_image" default="false"/>
+        <arg name="output_image_topic" default="/yolov5/image_out"/>
+
+        <!-- ROS TOPIC-->
+        <arg name="input_image_topic" default="/usb_cam/image_raw"/>
+        <arg name ="output_topic_bb" default="objects_rect"/>
+        <!--arg name="input_image_topic" default="/usb_cam/image_raw"/-->
+        <!-- <arg name="input_image_topic" default="/rgb/image_raw"/> -->
+        <!-- <arg name="input_image_topic" default="/camera/color/image_raw"/> -->
+        <!-- <arg name="input_image_topic" default="/hand_camera/color/image_raw"/> -->
+
+        <arg name="output_topic" default="/yolov5/detections"/>
+
+        <node pkg="yolov8_ros" name="yolov8" type="detect_ros.py" output="screen">
+            <param name="weights" value="$(arg weights)"/>
+            <param name="conf" value="$(arg conf)"/>
+
+            <param name="inference_size_h" value="$(arg inference_size_h)"/>
+            <param name="inference_size_w" value="$(arg inference_size_w)"/>
+
+            <param name="view_image" value="$(arg view_image)"/>
+            <param name="save_image" value="$(arg save_image)"/>
+
+            <param name="publish_image" type="bool" value="$(arg publish_image)"/>
+            <param name="output_topic_bb" value="$(arg output_topic_bb)"/>
+            <param name="output_image_topic" value="$(arg output_image_topic)"/>
+
+            <param name="initial_predict" type="bool" value="True"/>
+            <param name="input_image_topic" value="$(arg input_image_topic)"/>
+        </node>
+
+        <!-- YOLOv8 3D -->
+        <node name="object_pose_publisher_node" pkg="sobit_common_library" type="object_pose_publisher_v2" output="screen"/>
+        <param name="map_frame_name" type="string" value="azure_camera_base"/>
+        <param name="base_frame_name" type="string" value="azure_camera_base"/>
+        <param name="cloud_topic_name" type="string" value="/points2/"/>
+        <param name="img_topic_name" type="string" value="/rgb/image_raw"/>
+        <param name="execute_default" type="bool" value="false"/>
+    </group>
+
+</launch>

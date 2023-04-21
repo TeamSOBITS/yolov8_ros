@@ -25,7 +25,7 @@ class Yolov8Detector:
         self.view_image = rospy.get_param("~view_image")
         self.save_image = rospy.get_param("~save_image")
         self.conf = rospy.get_param("~conf")
-        self.output_topic_bb = rospy.get_param("~output_topic_bb")
+        self.output_topic_bb = rospy.get_param("~output_topic_bb") #default: "bjects_rect"
         
         #Define publishers
         self.pub_result_img = rospy.Publisher("detect_result", Image, queue_size=10) #結果画像

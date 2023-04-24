@@ -47,4 +47,5 @@ detect_result (sensor_msgs/Image): 結果画像　to be developed
 detect_ros.py: YOLOv8実行用プログラム
 pub_usb_cam.py: PC内蔵カメラ映像をPublishするプログラム
 publish_image.py: Enterキーを押下ごとに画像をPublishするプログラム
+train_yolov8.py: yolov8を用いて学習します　データセットを作って、5行目のdata引数にデータセットのパスを渡してください epoch=500, batch=4, imagesize=640で学習します
 ```

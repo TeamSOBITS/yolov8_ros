@@ -26,6 +26,7 @@ class Yolov8Detector:
         self.save_image = rospy.get_param("~save_image")
         self.conf = rospy.get_param("~conf")
         self.output_topic_bb = rospy.get_param("~output_topic_bb") #default: "bjects_rect"
+        self.weight_path = rospy.get_param("~weights") #weight name or path
         
         #Define publishers
         self.pub_result_img = rospy.Publisher("detect_result", Image, queue_size=10) #結果画像
@@ -36,7 +37,7 @@ class Yolov8Detector:
         print("publisher defined")
 
         #Set Inference size
-        #height, weight = 
+        #height,  = 
         self.img_size = [rospy.get_param("~inference_size_w", 1280), rospy.get_param("~inference_size_h", 720)]
         #self.img_size = check_imgsz(self.img_size, s = self.stride)
 

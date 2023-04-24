@@ -1,5 +1,5 @@
 <launch>
-    <arg name="weights" default="WEIGHT_NAME"/>
+    <arg name="weights" default="$(find yolov5_ros)/scripts/weights/azure_rcjp2022_500_v8n/best.pt"/>
     <arg name="conf" default="0.3"/>
 
     <!-- replace imgsz -->

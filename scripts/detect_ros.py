@@ -96,7 +96,7 @@ class Yolov8Detector:
         self.model = YOLO(self.weight_path)
         self.result = self.model.predict("yolov8_image.jpg", show=self.view_image, save=self.save_image, conf=self.conf)
         #self.result = self.model.predict(0, show=self.view_image) #USBcamera用
-        self.boxes = self.result[0].numpy().boxes #検出した全BBox
+        self.boxes = self.result[0].cpu().numpy().boxes #検出した全BBox
         self.names = self.result[0].names #モデルの全ラベル一覧
 
         #Fill BoundingBox Messages

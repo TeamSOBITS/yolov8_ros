@@ -93,7 +93,7 @@ class Yolov8Detector:
         cv2.imwrite("yolov8_image.jpg", cv_array)
 
         #Do the predict with YOLOv8 (ultralytics)
-        self.model = YOLO("yolov8n.pt")
+        self.model = YOLO(self.weight_path)
         self.result = self.model.predict("yolov8_image.jpg", show=self.view_image, save=self.save_image, conf=self.conf)
         #self.result = self.model.predict(0, show=self.view_image) #USBcamera用
         self.boxes = self.result[0].numpy().boxes #検出した全BBox

@@ -1,0 +1,4 @@
+scripts/datasets/
+scripts/weights/
+scripts/runs/
+scripts/yolov8n.pt

@@ -1,53 +1,54 @@
 <launch>
-    <arg name="dataset_name" default="azure_rcjp2022_500_v8n"/>
-    <arg name="weight_name" default="best.pt"/>
-    <arg name="weights" default="$(find yolov8_ros)/scripts/weights/$(arg dataset_name)/$(arg weight_name)"/>
-    
-        
-    <arg name="conf" default="0.3"/>
+    <group ns = "yolov8_ros">
+        <arg name="dataset_name" default="azure_rcjp2022_500_v8n"/>
+        <arg name="weight_name" default="best.pt"/>
+        <arg name="weights" default="$(find yolov8_ros)/scripts/weights/$(arg dataset_name)/$(arg weight_name)"/>
 
-    <!-- replace imgsz -->
-    <arg name="inference_size_h" default="640"/>
-    <arg name="inference_size_w" default="480"/>
 
-    <!-- Visualize using OpenCV window -->
-    <arg name="view_image" default="false"/>
+        <arg name="conf" default="0.3"/>
 
-    <!-- Save result images using YOLOv8: save-option -->
-    <!-- the images will be saved to /home/<user>/.ros -->
-    <arg name="save_image" default="false"/>
+        <!-- replace imgsz -->
+        <arg name="inference_size_h" default="640"/>
+        <arg name="inference_size_w" default="480"/>
 
-    <!-- Optional topic (publishing annotated image) -->
-    <arg name="publish_image" default="false"/>
-    <arg name="output_image_topic" default="/yolov5/image_out"/>
+        <!-- Visualize using OpenCV window -->
+        <arg name="view_image" default="false"/>
 
-    <!-- ROS TOPIC-->
-    <arg name="input_image_topic" default="/usb_cam/image_raw"/>
-    <arg name ="output_topic_bb" default="objects_rect"/>
-    <!--arg name="input_image_topic" default="/usb_cam/image_raw"/-->
-    <!-- <arg name="input_image_topic" default="/rgb/image_raw"/> -->
-    <!-- <arg name="input_image_topic" default="/camera/color/image_raw"/> -->
-    <!-- <arg name="input_image_topic" default="/hand_camera/color/image_raw"/> -->
+        <!-- Save result images using YOLOv8: save-option -->
+        <!-- the images will be saved to /home/<user>/.ros -->
+        <arg name="save_image" default="false"/>
 
-    <arg name="output_topic" default="/yolov5/detections"/>
+        <!-- Optional topic (publishing annotated image) -->
+        <arg name="publish_image" default="false"/>
+        <arg name="output_image_topic" default="/yolov5/image_out"/>
 
-    <node pkg="yolov8_ros" name="yolov8" type="detect_ros.py" output="screen">
-        <param name="weights" value="$(arg weights)"/>
-        <param name="conf" value="$(arg conf)"/>
+        <!-- ROS TOPIC-->
+        <arg name="input_image_topic" default="/usb_cam/image_raw"/>
+        <arg name ="output_topic_bb" default="objects_rect"/>
+        <!--arg name="input_image_topic" default="/usb_cam/image_raw"/-->
+        <!-- <arg name="input_image_topic" default="/rgb/image_raw"/> -->
+        <!-- <arg name="input_image_topic" default="/camera/color/image_raw"/> -->
+        <!-- <arg name="input_image_topic" default="/hand_camera/color/image_raw"/> -->
 
-        <param name="inference_size_h" value="$(arg inference_size_h)"/>
-        <param name="inference_size_w" value="$(arg inference_size_w)"/>
+        <arg name="output_topic" default="/yolov5/detections"/>
 
-        <param name="view_image" value="$(arg view_image)"/>
-        <param name="save_image" value="$(arg save_image)"/>
+        <node pkg="yolov8_ros" name="yolov8" type="detect_ros.py" output="screen">
+            <param name="weights" value="$(arg weights)"/>
+            <param name="conf" value="$(arg conf)"/>
 
-        <param name="publish_image" type="bool" value="$(arg publish_image)"/>
-        <param name="output_topic_bb" value="$(arg output_topic_bb)"/>
-        <param name="output_image_topic" value="$(arg output_image_topic)"/>
+            <param name="inference_size_h" value="$(arg inference_size_h)"/>
+            <param name="inference_size_w" value="$(arg inference_size_w)"/>
 
-        <param name="initial_predict" type="bool" value="True"/>
-        <param name="input_image_topic" value="$(arg input_image_topic)"/>
-    </node>
+            <param name="view_image" value="$(arg view_image)"/>
+            <param name="save_image" value="$(arg save_image)"/>
 
+            <param name="publish_image" type="bool" value="$(arg publish_image)"/>
+            <param name="output_topic_bb" value="$(arg output_topic_bb)"/>
+            <param name="output_image_topic" value="$(arg output_image_topic)"/>
+
+            <param name="initial_predict" type="bool" value="True"/>
+            <param name="input_image_topic" value="$(arg input_image_topic)"/>
+        </node>
+    </group>
 
 </launch>

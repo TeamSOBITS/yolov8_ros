@@ -10,6 +10,7 @@ from sensor_msgs.msg import Image, CompressedImage
 from sobit_common_msg.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
 from sobit_common_msg.srv import RunCtrl, RunCtrlResponse
 from ultralytics.yolo.utils.plotting import Annotator, colors
+from copy import deepcopy
 # from ultralytics.yolo.data.augment import LetterBox
 # from ultralytics.yolo.utils.checks import check_imgsz, check_requirements
 # from ultralytics.yolo.utils import ops
@@ -100,6 +101,9 @@ class Yolov8Detector:
         self.names = self.result[0].names #モデルの全ラベル一覧
 
         #Fill BoundingBox Messages
+        detect_poses = ObjectPoseArray()
+        bounding_boxes = BoundingBoxes()
+        bounding_boxes.header = msg.header
         for x in reversed(range(len(self.boxes))):
             #Fill prediction
             bounding_box = BoundingBox()
@@ -112,15 +116,14 @@ class Yolov8Detector:
             bounding_box.xmax = int(box.xyxy[0][2]) #Xmax NOT normalized 0-1
             bounding_box.ymax = int(box.xyxy[0][3]) #Ymax NOT normalized 0-1
 
-            bounding_boxes = BoundingBoxes()
-            bounding_boxes.header = msg.header
-            bounding_boxes.bounding_boxes.append(bounding_box)
-
+            print(bounding_box.Class)
+            
+            bounding_boxes.bounding_boxes.append(deepcopy(bounding_box))
             #Fill detect_list
             detect_list = StringArray()
             label = f"{bounding_box.Class} {bounding_box.probability:.2f}"
-            detect_list.data.append(label)
-
+            detect_list.data.append(deepcopy(label))
+            
             #generate result image
             img_result = cv_array
             (w, h), baseline = cv2.getTextSize(label,
@@ -151,7 +154,6 @@ class Yolov8Detector:
             img_result = self.bridge.cv2_to_imgmsg(img_result, "bgr8")
             self.pub_result_img.publish(img_result)
 
-
             #Fill detect_poses
             obj_pose = ObjectPose()
             obj_pose.Class = label
@@ -159,14 +161,14 @@ class Yolov8Detector:
             obj_pose.pose.position.y = bounding_box.ymin + (bounding_box.ymax - bounding_box.ymin) / 2
             obj_pose.pose.position.z = -1
 
-            detect_poses = ObjectPoseArray()
-            detect_poses.object_poses.append(obj_pose)
+            detect_poses.object_poses.append(deepcopy(obj_pose))
+        #print(bounding_boxes.bounding_boxes)#ここインデント下げるとboundingboesが死ぬ #DEBUG
         detect_poses.header = msg.header
-
         #Publish PREDICTION
         time = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')[:-3]
         print(time)
         self.pub_prediction.publish(bounding_boxes)
+        
         try:
             self.pub_detect_poses.publish(detect_poses)
             self.pub_detect_list.publish(detect_list)

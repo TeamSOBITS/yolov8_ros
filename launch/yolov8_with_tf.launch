@@ -1,7 +1,7 @@
 <launch>
     <group ns = "yolov8_ros">
         <arg name="dataset_name" default="azure_rcjp2022_500_v8n"/>
-        <arg name="weight_name" default="best.pt"/>
+        <arg name="weight_name" default="yolov8n.pt"/>
         <arg name="weights" default="$(find yolov8_ros)/scripts/weights/$(arg dataset_name)/$(arg weight_name)"/>
         
 

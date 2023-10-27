@@ -10,6 +10,7 @@ from sensor_msgs.msg import Image, CompressedImage
 from sobit_common_msg.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
 from sobit_common_msg.srv import RunCtrl, RunCtrlResponse
 from ultralytics.yolo.utils.plotting import Annotator, colors
+from copy import deepcopy
 # from ultralytics.yolo.data.augment import LetterBox
 # from ultralytics.yolo.utils.checks import check_imgsz, check_requirements
 # from ultralytics.yolo.utils import ops
@@ -25,17 +26,19 @@ class Yolov8Detector:
         self.view_image = rospy.get_param("~view_image")
         self.save_image = rospy.get_param("~save_image")
         self.conf = rospy.get_param("~conf")
+        self.output_topic_bb = rospy.get_param("~output_topic_bb") #default: "bjects_rect"
+        self.weight_path = rospy.get_param("~weights") #weight name or path
         
         #Define publishers
         self.pub_result_img = rospy.Publisher("detect_result", Image, queue_size=10) #結果画像
         self.pub_detect_list = rospy.Publisher("detect_list", StringArray, queue_size=10) #Label list (class conf)
-        self.pub_detect_poses = rospy.Publisher("detect_poses", ObjectPoseArray, queue_size=10) #center xy(normalized)
-        self.pub_prediction = rospy.Publisher("output_topic", BoundingBoxes, queue_size=10) #BBox (xywh_normalized)
+        self.pub_detect_poses = rospy.Publisher("detect_poses", ObjectPoseArray, queue_size=10) #center xy(NOTnormalized)
+        self.pub_prediction = rospy.Publisher(self.output_topic_bb, BoundingBoxes, queue_size=10) #BBox (xywh_NOTnormalized)
         self.pub_image = rospy.Publisher("image_pub", Image, queue_size=10) #subscribed Image
         print("publisher defined")
 
         #Set Inference size
-        #height, weight = 
+        #height,  = 
         self.img_size = [rospy.get_param("~inference_size_w", 1280), rospy.get_param("~inference_size_h", 720)]
         #self.img_size = check_imgsz(self.img_size, s = self.stride)
 
@@ -91,13 +94,16 @@ class Yolov8Detector:
         cv2.imwrite("yolov8_image.jpg", cv_array)
 
         #Do the predict with YOLOv8 (ultralytics)
-        self.model = YOLO("yolov8n.pt")
+        self.model = YOLO(self.weight_path)
         self.result = self.model.predict("yolov8_image.jpg", show=self.view_image, save=self.save_image, conf=self.conf)
         #self.result = self.model.predict(0, show=self.view_image) #USBcamera用
-        self.boxes = self.result[0].numpy().boxes #検出した全BBox
+        self.boxes = self.result[0].cpu().numpy().boxes #検出した全BBox
         self.names = self.result[0].names #モデルの全ラベル一覧
 
         #Fill BoundingBox Messages
+        detect_poses = ObjectPoseArray()
+        bounding_boxes = BoundingBoxes()
+        bounding_boxes.header = msg.header
         for x in reversed(range(len(self.boxes))):
             #Fill prediction
             bounding_box = BoundingBox()
@@ -105,20 +111,19 @@ class Yolov8Detector:
             c = int(box.cls[0]) #object number (int)
             bounding_box.Class = self.names[c] #object name (char)
             bounding_box.probability = box.conf[0] #Confidence
-            bounding_box.xmin = box.xyxyn[0][0] #Xmin normalized 0-1
-            bounding_box.ymin = box.xyxyn[0][1] #Ymin normalized 0-1
-            bounding_box.xmax = box.xyxyn[0][2] #Xmax normalized 0-1
-            bounding_box.ymax = box.xyxyn[0][3] #Ymax normalized 0-1
+            bounding_box.xmin = int(box.xyxy[0][0]) #Xmin NOT normalized 0-1
+            bounding_box.ymin = int(box.xyxy[0][1]) #Ymin NOT normalized 0-1
+            bounding_box.xmax = int(box.xyxy[0][2]) #Xmax NOT normalized 0-1
+            bounding_box.ymax = int(box.xyxy[0][3]) #Ymax NOT normalized 0-1
 
-            bounding_boxes = BoundingBoxes()
-            bounding_boxes.header = msg.header
-            bounding_boxes.bounding_boxes.append(bounding_box)
-
+            print(bounding_box.Class)
+            
+            bounding_boxes.bounding_boxes.append(deepcopy(bounding_box))
             #Fill detect_list
             detect_list = StringArray()
             label = f"{bounding_box.Class} {bounding_box.probability:.2f}"
-            detect_list.data.append(label)
-
+            detect_list.data.append(deepcopy(label))
+            
             #generate result image
             img_result = cv_array
             (w, h), baseline = cv2.getTextSize(label,
@@ -149,7 +154,6 @@ class Yolov8Detector:
             img_result = self.bridge.cv2_to_imgmsg(img_result, "bgr8")
             self.pub_result_img.publish(img_result)
 
-
             #Fill detect_poses
             obj_pose = ObjectPose()
             obj_pose.Class = label
@@ -157,14 +161,14 @@ class Yolov8Detector:
             obj_pose.pose.position.y = bounding_box.ymin + (bounding_box.ymax - bounding_box.ymin) / 2
             obj_pose.pose.position.z = -1
 
-            detect_poses = ObjectPoseArray()
-            detect_poses.object_poses.append(obj_pose)
+            detect_poses.object_poses.append(deepcopy(obj_pose))
+        #print(bounding_boxes.bounding_boxes)#ここインデント下げるとboundingboesが死ぬ #DEBUG
         detect_poses.header = msg.header
-
         #Publish PREDICTION
         time = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')[:-3]
         print(time)
         self.pub_prediction.publish(bounding_boxes)
+        
         try:
             self.pub_detect_poses.publish(detect_poses)
             self.pub_detect_list.publish(detect_list)

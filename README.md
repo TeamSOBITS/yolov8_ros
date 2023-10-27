@@ -2,11 +2,14 @@
 YOLOv8のROS用パッケージ
 /usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。
 
+* yolov8 gihub: https://github.com/ultralytics/ultralytics
+* yolov8Docs:https://docs.ultralytics.com/
+
 ## Requirements
-Ubuntu: 20.04
-ROS: Noetic
-Python: >=3.7
-Pytorch: >=1.7
+* Ubuntu: 20.04
+* ROS: Noetic
+* Python: >=3.7
+* Pytorch: >=1.7
 
 ## Installation
 pipよりultralyticsとrequirementsをインストール
@@ -44,4 +47,5 @@ detect_result (sensor_msgs/Image): 結果画像　to be developed
 detect_ros.py: YOLOv8実行用プログラム
 pub_usb_cam.py: PC内蔵カメラ映像をPublishするプログラム
 publish_image.py: Enterキーを押下ごとに画像をPublishするプログラム
+train_yolov8.py: yolov8を用いて学習します　データセットを作って、5行目のdata引数にデータセットのパスを渡してください epoch=500, batch=4, imagesize=640で学習します
 ```

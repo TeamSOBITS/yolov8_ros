@@ -37,7 +37,7 @@ class Yolov8Detector:
         self.img_size = [rospy.get_param("~inference_size_w", 1280), rospy.get_param("~inference_size_h", 720)]
         #self.img_size = check_imgsz(self.img_size, s = self.stride)
 
-        #Start Run_control Service(???????????????)
+        #Start Run_control Service
         self.server = rospy.Service("runctrl", RunCtrl, self.run_ctrl_server)
         self.sub_run_ctrl = rospy.Subscriber("run_ctrl", Bool, self.run_ctrl_callback)
         print("define sub procedure.")
@@ -66,7 +66,7 @@ class Yolov8Detector:
         self.can_predict = msg.data
         rospy.loginfo("run ctrl -> {}".format(self.can_predict))
 
-    #####CALLBACK (when Subscribing a Image Publish)#########
+    ##### CALLBACK (Publish results when Subscribing a Image) #########
     def callback(self,msg):
         if not self.can_predict:
             return
@@ -81,19 +81,17 @@ class Yolov8Detector:
             cv_array = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         else:
             cv_array = self.bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
-
-
-        #np.ndarray型で渡すとvisualizeができないので、cv2.imwriteしてから、predict()に保存パスを渡します
-        #多分home/<user名>/.ros/yolov8_image.jpgが出力されます
-        #要検討　パフォーマンスに影響ある可能性
+           
+        #cv2.imwrite then use the written image path (ndarray can't use the visualize option in ultralytics)
+        #(the image is saved to path/to/home/<user_name>/.ros/yolov8_image.jpg)
         cv2.imwrite("yolov8_image.jpg", cv_array)
 
-        #Do the predict with YOLOv8 (ultralytics)
+        #Inference with YOLOv8 (ultralytics)
         self.model = YOLO(self.weight_path)
         self.result = self.model.predict("yolov8_image.jpg", show=self.view_image, save=self.save_image, conf=self.conf)
-        #self.result = self.model.predict(0, show=self.view_image) #USBcamera用
-        self.boxes = self.result[0].cpu().numpy().boxes #検出した全BBox
-        self.names = self.result[0].names #モデルの全ラベル一覧
+        #self.result = self.model.predict(0, show=self.view_image) #for USBcamera
+        self.boxes = self.result[0].cpu().numpy().boxes #All Boundig box
+        self.names = self.result[0].names #All label list
 
         #Fill BoundingBox Messages
         detect_poses = ObjectPoseArray()
@@ -155,11 +153,10 @@ class Yolov8Detector:
             obj_pose.pose.position.x = bounding_box.xmin + (bounding_box.xmax - bounding_box.xmin) / 2
             obj_pose.pose.position.y = bounding_box.ymin + (bounding_box.ymax - bounding_box.ymin) / 2
             obj_pose.pose.position.z = -1
-
             detect_poses.object_poses.append(deepcopy(obj_pose))
-        #print(bounding_boxes.bounding_boxes)#ここインデント下げるとboundingboesが死ぬ #DEBUG
+
         detect_poses.header = msg.header
-        #Publish PREDICTION
+        #Publish Predection
         time = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')[:-3]
         print(time)
         self.pub_prediction.publish(bounding_boxes)

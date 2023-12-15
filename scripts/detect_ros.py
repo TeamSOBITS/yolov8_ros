@@ -7,15 +7,10 @@ from rostopic import get_topic_type
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
-from sobit_common_msg.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
-from sobit_common_msg.srv import RunCtrl, RunCtrlResponse
-from ultralytics.yolo.utils.plotting import Annotator, colors
+from yolov8_ros.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
+from yolov8_ros.srv import RunCtrl, RunCtrlResponse
+from ultralytics.utils.plotting import Annotator, colors
 from copy import deepcopy
-# from ultralytics.yolo.data.augment import LetterBox
-# from ultralytics.yolo.utils.checks import check_imgsz, check_requirements
-# from ultralytics.yolo.utils import ops
-# from ultralytics.yolo.engine.model import DetectionModel
-# from copy import deepcopy
 import datetime
 
 class Yolov8Detector:

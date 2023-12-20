@@ -1,3 +1,7 @@
 scripts/datasets/
 scripts/runs/
-scripts/yolov8n.pt
+scripts/weights
+scripts/pub_usb_cam.py
+scripts/publish_image.py
+scripts/train_yolov8.py
+scripts/yolov8*.pt

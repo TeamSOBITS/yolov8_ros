@@ -39,6 +39,7 @@
 ## 概要
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
+<img width="100%" src="https://raw.githubusercontent.com/ultralytics/assets/main/yolov5/v70/splash.png"></a>
 
 ここで本レポジトリの目的や解決する課題を中心にアピールしてください．
 

@@ -7,8 +7,8 @@ from rostopic import get_topic_type
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
-from yolov8_ros.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
-from yolov8_ros.srv import RunCtrl, RunCtrlResponse
+from sobits_msgs.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
+from sobits_msgs.srv import RunCtrl, RunCtrlResponse
 from ultralytics.utils.plotting import Annotator, colors
 from copy import deepcopy
 import datetime

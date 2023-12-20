@@ -4,5 +4,5 @@ Changelog for package catkin
 
 1.0.0 (2023-12-20)
 -------------------
-*first public release
+* first public release
 -------------------

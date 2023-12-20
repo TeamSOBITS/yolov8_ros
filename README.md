@@ -1,6 +1,6 @@
 <a name="readme-top"></a>
 
-[JP](README.md) | [EN](template_readme_en.md)
+[JP](template_readme.md) | [EN](template_readme_en.md)
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -39,9 +39,14 @@
 ## 概要
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
-<img width="100%" src="https://raw.githubusercontent.com/ultralytics/assets/main/yolov5/v70/splash.png"></a>
+[![How to Train Ultralytics YOLOv8 models on Your Custom Dataset in Google Colab](https://img.youtube.com/vi/LNwODJXcvt4/0.jpg)](https://www.youtube.com/watch?v=LNwODJXcvt4)
 
-ここで本レポジトリの目的や解決する課題を中心にアピールしてください．
+YOLOv8のROS用パッケージ
+/usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。
+
+* yolov8 gihub: https://github.com/ultralytics/ultralytics
+* yolov8Docs:https://docs.ultralytics.com/
+
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -53,29 +58,29 @@
 ここで，本レポジトリのセットアップ方法について説明してください．
 
 ### 環境条件
-
-必要な外部ソフトや正常動作を確認した環境について説明してください．
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+* Ubuntu: 20.04
+* ROS: Noetic
+* Python: >=3.7
+* Pytorch: >=1.7
 
 ### インストール方法
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/github_username/repo_name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+1. pipよりultralyticsとrequirementsをインストール
+```
+pip install ultralytics
+```
 
+2. TeamSOBITS/yolov8_rosのインストール
+
+```
+cd ~/catkin_ws/src
+git clone https://github.com/TeamSOBITS/yolov8_ros.git -b master
+```
+
+3. TeamSOBITS/sobits_msgsをインストール
+```
+git clone https://github.com/TeamSOBITS/sobits_msgs.git
+```
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
@@ -84,19 +89,88 @@
 ## 実行・操作方法
 
 <!-- デモの実行方法やスクリーンショットがあるとわかりやすくなるでしょう -->
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/github_username/repo_name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+YOLOv8
+```
+roslaunch yolov8_ros yolov8.launch
+```
+
+
+### Published Topics
+```
+detect_list (sobits_msgs/StringArray): 検出物体一覧
+detect_poses (sobits_msgs/ObjectPoseArray): 検出物体位置
+output_topic (sobits_msgs/BoundingBoxes): 検出物体のBBox情報 (xyxyn)
+detect_result (sensor_msgs/Image): 結果画像　to be developed
+```
+### Subscribed Topics
+```
+/usb_cam/image_raw (sensor_msgs/Image): YOLOv8の入力画像
+```
+### Scripts
+```
+detect_ros.py: YOLOv8実行用プログラム
+pub_usb_cam.py: PC内蔵カメラ映像をPublishするプログラム
+publish_image.py: Enterキーを押下ごとに画像をPublishするプログラム
+train_yolov8.py: yolov8を用いて学習します　データセットを作って、5行目のdata引数にデータセットのパスを渡してください epoch=500, batch=4, imagesize=640で学習します
+```
+
+### sobits_msgsについて
+yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します．
+1.  `BoundingBox.msg` : YOLOなどで得られた2次元情報をまとめたmsgです．
+    ```yaml
+    string  Class
+    float64 probability
+    int32   xmin
+    int32   ymin
+    int32   xmax
+    int32   ymax
+    ```
+
+> [!WARNING]
+> `BoundingBox.msg`は今後廃止状態（deprecated）になる予定です．
+
+2.  `BoundingBoxes.msg` : 複数の`BoundingBox.msg`を配列にしたmsgです．
+    ```yaml
+    Header header
+    BoundingBox[] bounding_boxes
+    ```
+
+> [!WARNING]
+> `BoundingBoxes.msg`は今後廃止状態（deprecated）になる予定です．
+
+3.  `ObjectPose.msg` : YOLOなどで得られた物体の3次元情報をまとめたmsgです．
+    ```yaml
+    string Class
+    geometry_msgs/Pose pose
+    int32 detect_id
+    ```
+
+> [!WARNING]
+> `ObjectPose.msg`は今後廃止状態（deprecated）になる予定です．
+
+4.  `ObjectPoseArray.msg` : 複数の`ObjectPose.msg`を配列にしたmsgです．
+    ```yaml
+    Header header
+    ObjectPose[] object_poses
+    ```
+
+> [!WARNING]
+> `ObjectPoseArray.msg`は今後廃止状態（deprecated）になる予定です．
+
+5.  `StringArray.msg` : 複数の文字型情報を配列にしたmsgです．
+    ```yaml
+    Header header
+    string[] data
+    ```
+
+6.  `RunCtrl.srv` : 起動・停止を指定するためのsrvです．
+    ```yaml
+    bool request
+    ---
+    bool response
+    ```
+
+sobits_msgsの詳細について，[TeamSOBTIS/sobits_msgs](https://github.com/TeamSOBITS/sobits_msgs) をご覧ください．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -105,12 +179,10 @@
 <!-- マイルストーン -->
 ## マイルストーン
 
-- [x] 目標 1
-- [ ] 目標 2
-- [ ] 目標 3
-    - [ ] サブ目標
+- [ ] README.en.mdの執筆
+- [ ] publish間隔を設定できる機能の実装(object_pose_publisherへのpublishを制御するために必要です．)
 
-現時点のバッグや新規機能の依頼を確認するために[Issueページ](https://github.com/github_username/repo_name/issues) をご覧ください．
+現時点のバッグや新規機能の依頼を確認するために[Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues) をご覧ください．
 
 <p align="right">(<a href="#readme-top">上に</a>)</p>
 
@@ -119,7 +191,7 @@
 <!-- 変更履歴 -->
 ## 変更履歴
 
-- 2.0: 代表的なタイトル
+<!-- - 2.0: 代表的なタイトル
   - 詳細 1
   - 詳細 2
   - 詳細 3
@@ -130,7 +202,7 @@
 - 1.0: 代表的なタイトル
   - 詳細 1
   - 詳細 2
-  - 詳細 3
+  - 詳細 3 -->
 
 <!-- CONTRIBUTING -->
 <!-- ## Contributing
@@ -162,8 +234,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- 参考文献 -->
 ## 参考文献
 
-* []()
-* []()
+* [YOLOv8](https://github.com/ultralytics/ultralytics)
+* [YOLOv8 Docs](https://docs.ultralytics.com/)
 * []()
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
@@ -174,9 +246,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/TeamSOBITS/yolov8_ros.svg?style=for-the-badge
 [contributors-url]: https://github.com/TeamSOBITS/yolov8_ros/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/eamSOBITS/yolov8_ros.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/TeamSOBITS/yolov8_ros.svg?style=for-the-badge
 [forks-url]: https://github.com/TeamSOBITS/yolov8_ros/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/TeamSOBITS/yolov8_ros.svg?style=for-the-badge
 [stars-url]: https://github.com/TeamSOBITS/yolov8_ros/stargazers
 [issues-shield]: https://img.shields.io/github/issues/TeamSOBITS/yolov8_ros.svg?style=for-the-badge
 [issues-url]: https://github.com/TeamSOBITS/yolov8_ros/issues

@@ -7,11 +7,10 @@ from cv_bridge import CvBridge
 
 def operator():
     rospy.init_node("operator",anonymous=True)
-    pub=rospy.Publisher("/rgb/image_raw",Image,queue_size=1)
+    pub=rospy.Publisher("/usb_cam/image_raw",Image,queue_size=1)
 
     #read image
-    filename="man4.jpeg"
-    print(filename)
+    filename="bus.jpg"
     filepath=os.path.join(os.path.dirname(os.path.abspath(__file__)),filename)
     im=cv2.imread(filepath,cv2.IMREAD_COLOR)
 

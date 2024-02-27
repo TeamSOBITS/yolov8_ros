@@ -12,81 +12,85 @@
 
 <!-- 目次 -->
 <details>
-  <summary>目次</summary>
+  <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#概要">概要</a>
+      <a href="#Introduction">Introduction</a>
     </li>
     <li>
-      <a href="#環境構築">環境構築</a>
+      <a href="#Getting Started">Getting Started</a>
       <ul>
-        <li><a href="#環境条件">環境条件</a></li>
-        <li><a href="#インストール方法">インストール方法</a></li>
+        <li><a href="#Requirements">Requirements</a></li>
+        <li><a href="#Installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#実行・操作方法">実行・操作方法</a></li>
-    <li><a href="#マイルストーン">マイルストーン</a></li>
-    <li><a href="#変更履歴">変更履歴</a></li>
+    <li><a href="#Launch and Usage">Launch and Usage</a></li>
+    <li><a href="#Milestone">Milestone</a></li>
+    <li><a href="#Change-Log">Change-Log</a></li>
     <!-- <li><a href="#contributing">Contributing</a></li> -->
     <!-- <li><a href="#license">License</a></li> -->
-    <li><a href="#参考文献">参考文献</a></li>
+    <li><a href="#Acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
 
 
 
 <!-- レポジトリの概要 -->
-## 概要
+## Introduction
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 [![How to Train Ultralytics YOLOv8 models on Your Custom Dataset in Google Colab](https://img.youtube.com/vi/LNwODJXcvt4/0.jpg)](https://www.youtube.com/watch?v=LNwODJXcvt4)
 
-YOLOv8のROS用パッケージ
-/usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。
+<!-- YOLOv8のROS用パッケージ -->
+The ROS package for YOLOv8
+<!-- /usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。 -->
+the package performs the inference with YOLOv8, and publishes the sensor_msgs/Image type message to the /usb_cam/image_raw topic. the published topic and some settings are changeable on launch file.
 
 * yolov8 gihub: https://github.com/ultralytics/ultralytics
 * yolov8Docs:https://docs.ultralytics.com/
 
 
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- セットアップ -->
-## セットアップ
+## Getting Started
+<!-- ここで，本レポジトリのセットアップ方法について説明してください． -->
 
-ここで，本レポジトリのセットアップ方法について説明してください．
-
-### 環境条件
+### Requirements
 * Ubuntu: 20.04
 * ROS: Noetic
 * Python: >=3.7
 * Pytorch: >=1.7
 
-### インストール方法
+### Installation
 
-1. pipよりultralyticsとrequirementsをインストール
+<!-- 1. pipよりultralyticsとrequirementsをインストール -->
+1. Install "ultralytics" from pip.
 ```
 pip install ultralytics
 ```
 
-2. TeamSOBITS/yolov8_rosのインストール
+<!-- 2. TeamSOBITS/yolov8_rosのインストール -->
+2. clone TeamSOBITS/yolov8_ros
 
 ```
 cd ~/catkin_ws/src
 git clone https://github.com/TeamSOBITS/yolov8_ros.git -b master
 ```
 
-3. TeamSOBITS/sobits_msgsをインストール
+<!-- 3. TeamSOBITS/sobits_msgsをインストール -->
+3. clone TeamSOBITS/objects_msgs
 ```
 git clone https://github.com/TeamSOBITS/sobits_msgs.git
 ```
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- 実行・操作方法 -->
-## 実行・操作方法
+## Launch and Usage
 
 <!-- デモの実行方法やスクリーンショットがあるとわかりやすくなるでしょう -->
 YOLOv8
@@ -97,26 +101,28 @@ roslaunch yolov8_ros yolov8.launch
 
 ### Published Topics
 ```
-detect_list (sobits_msgs/StringArray): 検出物体一覧
-detect_poses (sobits_msgs/ObjectPoseArray): 検出物体位置
-output_topic (sobits_msgs/BoundingBoxes): 検出物体のBBox情報 (xyxyn)
-detect_result (sensor_msgs/Image): 結果画像　to be developed
+detect_list (sobits_msgs/StringArray): a list of detected objects
+detect_poses (sobits_msgs/ObjectPoseArray): the location of the objects
+output_topic (sobits_msgs/BoundingBoxes): information of Bounding boxes of the objects (xyxyn)
+detect_result (sensor_msgs/Image): the result image: TBD
 ```
 ### Subscribed Topics
 ```
-/usb_cam/image_raw (sensor_msgs/Image): YOLOv8の入力画像
+/usb_cam/image_raw (sensor_msgs/Image): the input image to YOLOv8
 ```
 ### Scripts
 ```
-detect_ros.py: YOLOv8実行用プログラム
-pub_usb_cam.py: PC内蔵カメラ映像をPublishするプログラム
-publish_image.py: Enterキーを押下ごとに画像をPublishするプログラム
-train_yolov8.py: yolov8を用いて学習します　データセットを作って、5行目のdata引数にデータセットのパスを渡してください epoch=500, batch=4, imagesize=640で学習します
+detect_ros.py: YOLOv8 inference code
+
+pub_usb_cam.py: the debug code (publishes PC Cam as Image type message)
+publish_image.py: the debug code (publishes a image by press Enter)
+train_yolov8.py: do the learning by YOLOv8: you must make a dataset, run the code with the path to your dataset. the learning is executed by epoch=500, batch=4, imagesize=640.
 ```
 
-### sobits_msgsについて
-yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します．
-1.  `BoundingBox.msg` : YOLOなどで得られた2次元情報をまとめたmsgです．
+### sobits_msgs
+<!-- yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します． -->
+yolov8_ros requires TeamSOBITS's msg and srv.
+1.  `BoundingBox.msg` : includes a bounding box information.
     ```yaml
     string  Class
     float64 probability
@@ -127,18 +133,19 @@ yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します．
     ```
 
 > [!WARNING]
-> `BoundingBox.msg`は今後廃止状態（deprecated）になる予定です．
+<!-- > `BoundingBox.msg`は今後廃止状態（deprecated）になる予定です． -->
+> `BoundingBox.msg` will be deprecated soon.
 
-2.  `BoundingBoxes.msg` : 複数の`BoundingBox.msg`を配列にしたmsgです．
+2.  `BoundingBoxes.msg` : includes some BoundingBox.msg as a array
     ```yaml
     Header header
     BoundingBox[] bounding_boxes
     ```
 
 > [!WARNING]
-> `BoundingBoxes.msg`は今後廃止状態（deprecated）になる予定です．
+> `BoundingBoxes.msg` will be deprecated soon.
 
-3.  `ObjectPose.msg` : YOLOなどで得られた物体の3次元情報をまとめたmsgです．
+3.  `ObjectPose.msg` : includes 3D information of a detected object.
     ```yaml
     string Class
     geometry_msgs/Pose pose
@@ -146,50 +153,50 @@ yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します．
     ```
 
 > [!WARNING]
-> `ObjectPose.msg`は今後廃止状態（deprecated）になる予定です．
+> `ObjectPose.msg` will be deprecated soon.
 
-4.  `ObjectPoseArray.msg` : 複数の`ObjectPose.msg`を配列にしたmsgです．
+4.  `ObjectPoseArray.msg` : includes an array of ObjectPose.msg
     ```yaml
     Header header
     ObjectPose[] object_poses
     ```
 
 > [!WARNING]
-> `ObjectPoseArray.msg`は今後廃止状態（deprecated）になる予定です．
+> `ObjectPoseArray.msg` will be deprecated soon.
 
-5.  `StringArray.msg` : 複数の文字型情報を配列にしたmsgです．
+5.  `StringArray.msg` : includes an array of String data.
     ```yaml
     Header header
     string[] data
     ```
 
-6.  `RunCtrl.srv` : 起動・停止を指定するためのsrvです．
+6.  `RunCtrl.srv` : controls an execution of yolov8_ros inference.
     ```yaml
     bool request
     ---
     bool response
     ```
 
-sobits_msgsの詳細について，[TeamSOBTIS/sobits_msgs](https://github.com/TeamSOBITS/sobits_msgs) をご覧ください．
+the detail of sobits_msgs available at [TeamSOBTIS/sobits_msgs](https://github.com/TeamSOBITS/sobits_msgs)
 
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- マイルストーン -->
-## マイルストーン
+## Milestone
 
-- [ ] README.en.mdの執筆
-- [ ] publish間隔を設定できる機能の実装(object_pose_publisherへのpublishを制御するために必要です．)
+- [ ] write README.en.md: in progress
+- [ ] make the rate of publishment controllable
 
-現時点のバッグや新規機能の依頼を確認するために[Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues) をご覧ください．
+Issues page available at [Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues)
 
-<p align="right">(<a href="#readme-top">上に</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- 変更履歴 -->
-## 変更履歴
+## Change-Log
 
 <!-- - 2.0: 代表的なタイトル
   - 詳細 1
@@ -218,7 +225,7 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p> -->
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
@@ -227,18 +234,18 @@ Don't forget to give the project a star! Thanks again!
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p> -->
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
 <!-- 参考文献 -->
-## 参考文献
+## Acknowledgements
 
 * [YOLOv8](https://github.com/ultralytics/ultralytics)
 * [YOLOv8 Docs](https://docs.ultralytics.com/)
 * []()
 
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 

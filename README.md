@@ -179,7 +179,7 @@ sobits_msgsの詳細について，[TeamSOBTIS/sobits_msgs](https://github.com/T
 <!-- マイルストーン -->
 ## マイルストーン
 
-- [ ] README.en.mdの執筆
+- [x] README.en.mdの執筆
 - [ ] publish間隔を設定できる機能の実装(object_pose_publisherへのpublishを制御するために必要です．)
 
 現時点のバッグや新規機能の依頼を確認するために[Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues) をご覧ください．

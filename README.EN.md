@@ -186,7 +186,7 @@ the detail of sobits_msgs available at [TeamSOBTIS/sobits_msgs](https://github.c
 <!-- マイルストーン -->
 ## Milestone
 
-- [ ] write README.en.md: in progress
+- [x] write README.en.md: in progress
 - [ ] make the rate of publishment controllable
 
 Issues page available at [Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues)

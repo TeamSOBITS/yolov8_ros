@@ -106,15 +106,12 @@ roslaunch yolov8_ros yolov8.launch
 
 ### Published Topics
 ```
-detect_list (sobits_msgs/StringArray): 検出物体一覧
-detect_poses (sobits_msgs/ObjectPoseArray): 検出物体位置
-output_topic (sobits_msgs/BoundingBoxes): 検出物体のBBox情報 (xyxyn)
-detect_result (sensor_msgs/Image): 結果画像　to be developed
+/yolov8/detect_list (sobits_msgs/StringArray): 検出物体一覧
+/yolov8/detect_poses (sobits_msgs/ObjectPoseArray): 検出物体位置
+/yolov8/objects_rect (sobits_msgs/BoundingBoxes): 検出物体のBBox情報 (xyxyn)
+/yolov8/detect_result (sensor_msgs/Image): 結果画像　to be developed
 ```
-### Subscribed Topics
-```
-/usb_cam/image_raw (sensor_msgs/Image): YOLOv8の入力画像
-```
+
 ### Scripts
 ```
 detect_ros.py: YOLOv8実行用プログラム
@@ -124,94 +121,16 @@ train_yolov8.py: yolov8を用いて学習します　データセットを作っ
 ```
 
 ### sobits_msgsについて
-yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します．
-1.  `BoundingBox.msg` : YOLOなどで得られた2次元情報をまとめたmsgです．
-    ```yaml
-    string  Class
-    float64 probability
-    int32   xmin
-    int32   ymin
-    int32   xmax
-    int32   ymax
-    ```
 
-> [!WARNING]
-> `BoundingBox.msg`は今後廃止状態（deprecated）になる予定です．
-
-2.  `BoundingBoxes.msg` : 複数の`BoundingBox.msg`を配列にしたmsgです．
-    ```yaml
-    Header header
-    BoundingBox[] bounding_boxes
-    ```
-
-> [!WARNING]
-> `BoundingBoxes.msg`は今後廃止状態（deprecated）になる予定です．
-
-3.  `ObjectPose.msg` : YOLOなどで得られた物体の3次元情報をまとめたmsgです．
-    ```yaml
-    string Class
-    geometry_msgs/Pose pose
-    int32 detect_id
-    ```
-
-> [!WARNING]
-> `ObjectPose.msg`は今後廃止状態（deprecated）になる予定です．
-
-4.  `ObjectPoseArray.msg` : 複数の`ObjectPose.msg`を配列にしたmsgです．
-    ```yaml
-    Header header
-    ObjectPose[] object_poses
-    ```
-
-> [!WARNING]
-> `ObjectPoseArray.msg`は今後廃止状態（deprecated）になる予定です．
-
-5.  `StringArray.msg` : 複数の文字型情報を配列にしたmsgです．
-    ```yaml
-    Header header
-    string[] data
-    ```
-
-6.  `RunCtrl.srv` : 起動・停止を指定するためのsrvです．
-    ```yaml
-    bool request
-    ---
-    bool response
-    ```
-
+sobits_msgsは，SOBITSの独自のメッセージ型です．\
+検出結果やClass名も合わせたBoundingBoxなどがあります．\
 sobits_msgsの詳細について，[TeamSOBTIS/sobits_msgs](https://github.com/TeamSOBITS/sobits_msgs) をご覧ください．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
-
-<!-- マイルストーン -->
-## マイルストーン
-
-- [x] README.en.mdの執筆
-- [ ] publish間隔を設定できる機能の実装(object_pose_publisherへのpublishを制御するために必要です．)
-
-現時点のバッグや新規機能の依頼を確認するために[Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues) をご覧ください．
-
 <p align="right">(<a href="#readme-top">上に</a>)</p>
 
-
-
-<!-- 変更履歴 -->
-## 変更履歴
-
-<!-- - 2.0: 代表的なタイトル
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3
-- 1.1: 代表的なタイトル
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3
-- 1.0: 代表的なタイトル
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3 -->
 
 <!-- CONTRIBUTING -->
 <!-- ## Contributing
@@ -245,7 +164,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 * [YOLOv8](https://github.com/ultralytics/ultralytics)
 * [YOLOv8 Docs](https://docs.ultralytics.com/)
-* []()
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 

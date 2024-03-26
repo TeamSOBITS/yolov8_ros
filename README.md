@@ -42,7 +42,7 @@
 [![How to Train Ultralytics YOLOv8 models on Your Custom Dataset in Google Colab](https://img.youtube.com/vi/LNwODJXcvt4/0.jpg)](https://www.youtube.com/watch?v=LNwODJXcvt4)
 
 YOLOv8のROS用パッケージ
-/usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。
+sensor_msgs/Image型の画像データをSubscribeすることでYOLOv8による物体検出の推論を行います．
 
 * yolov8 gihub: https://github.com/ultralytics/ultralytics
 * yolov8Docs:https://docs.ultralytics.com/

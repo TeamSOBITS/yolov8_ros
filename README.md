@@ -131,9 +131,13 @@ roslaunch yolov8_ros yolov8_with_tf.launch
 
 ### Service Server
 - ROSの画像のみで推論する場合
+```
 /yolov8/run_ctr (sobits_msgs/RunCtrl): 推論のON/OFFを切り替える(True/False)
+```
 - ROSの画像にTF(3次元情報)もつけて出力する場合
+```
 /yolov8_bbox_to_tf/run_ctr (sobits_msgs/RunCtrl): 3次元化(TF化)のON/OFFを切り替える(True/False)
+```
 
 ### Scripts
 ```

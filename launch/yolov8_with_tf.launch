@@ -1,62 +1,56 @@
 <launch>
-    <group ns = "yolov8_ros">
-        <arg name="dataset_name" default="azure_rcjp2022_500_v8n"/>
-        <arg name="weight_name" default="yolov8n.pt"/>
-        <arg name="weights" default="$(find yolov8_ros)/scripts/weights/$(arg dataset_name)/$(arg weight_name)"/>
-        
+    <!-- weight file path -->
+    <arg name="weights" default="$(find yolov8_ros)/scripts/weights/azure_rcjp2022_500_v8n/best.pt"/>    <!-- change the weight path -->
 
-        <arg name="conf" default="0.3"/>
+    <!-- probability -->
+    <arg name="conf" default="0.3"/>
 
-        <!-- replace imgsz -->
-        <arg name="inference_size_h" default="640"/>
-        <arg name="inference_size_w" default="480"/>
+    <!-- replace imgsz -->
+    <arg name="inference_size_h" default="640"/>
+    <arg name="inference_size_w" default="480"/>
 
-        <!-- Visualize using OpenCV window -->
-        <arg name="view_image" default="false"/>
+    <!-- Visualize using OpenCV window -->
+    <arg name="view_image" default="false"/>
 
-        <!-- Save result images using YOLOv8: save-option -->
-        <!-- the images will be saved to /home/<user>/.ros -->
-        <arg name="save_image" default="false"/>
+    <!-- Save result images -->
+    <arg name="save_image" default="false"/>
 
-        <!-- Optional topic (publishing annotated image) -->
-        <arg name="publish_image" default="false"/>
-        <arg name="output_image_topic" default="/yolov5/image_out"/>
+    <!-- Publish Rate -->
+    <arg name="pub_rate" default="5"/>
 
-        <!-- ROS TOPIC-->
-        <arg name="input_image_topic" default="/usb_cam/image_raw"/>
-        <arg name ="output_topic_bb" default="objects_rect"/>
-        <!--arg name="input_image_topic" default="/usb_cam/image_raw"/-->
-        <!-- <arg name="input_image_topic" default="/rgb/image_raw"/> -->
-        <!-- <arg name="input_image_topic" default="/camera/color/image_raw"/> -->
-        <!-- <arg name="input_image_topic" default="/hand_camera/color/image_raw"/> -->
+    <!-- image topic name-->
+    <arg name="image_topic_name" default="/rgb/image_raw"/>    <!-- change the each camera -->
 
-        <arg name="output_topic" default="/yolov5/detections"/>
+    <node pkg="yolov8_ros" name="yolov8" type="detect_ros.py" output="screen">
+        <param name="weights" value="$(arg weights)"/>
+        <param name="conf" value="$(arg conf)"/>
 
-        <node pkg="yolov8_ros" name="yolov8" type="detect_ros.py" output="screen">
-            <param name="weights" value="$(arg weights)"/>
-            <param name="conf" value="$(arg conf)"/>
+        <param name="inference_size_h" value="$(arg inference_size_h)"/>
+        <param name="inference_size_w" value="$(arg inference_size_w)"/>
 
-            <param name="inference_size_h" value="$(arg inference_size_h)"/>
-            <param name="inference_size_w" value="$(arg inference_size_w)"/>
+        <param name="view_image" value="$(arg view_image)"/>
+        <param name="save_image" value="$(arg save_image)"/>
+        <param name="pub_rate"   value="$(arg pub_rate)"/>
 
-            <param name="view_image" value="$(arg view_image)"/>
-            <param name="save_image" value="$(arg save_image)"/>
+        <param name="initial_predict" type="bool" value="true"/>
+        <param name="image_topic_name" value="$(arg image_topic_name)"/>
+    </node>
 
-            <param name="publish_image" type="bool" value="$(arg publish_image)"/>
-            <param name="output_topic_bb" value="$(arg output_topic_bb)"/>
-            <param name="output_image_topic" value="$(arg output_image_topic)"/>
 
-            <param name="initial_predict" type="bool" value="True"/>
-            <param name="input_image_topic" value="$(arg input_image_topic)"/>
-        </node>
+    <!-- point cloud name -->
+    <arg name="point_cloud_name" default="/points2"/>    <!-- change the each camera -->
 
-        <!-- YOLOv8 with TF -->
-        <node name="object_pose_publisher_node" pkg="sobit_common_library" type="object_pose_publisher_v2" output="screen"/>
-        <param name="map_frame_name" type="string" value="azure_camera_base"/>
-        <param name="base_frame_name" type="string" value="azure_camera_base"/>
-        <param name="cloud_topic_name" type="string" value="/points2/"/>
-        <param name="img_topic_name" type="string" value="/rgb/image_raw"/>
-        <param name="execute_default" type="bool" value="false"/>
-    </group>
-
+    <include file="$(find bbox_to_tf)/launch/bbox_to_tf.launch">
+        <arg name="node_name"                 value="yolov8_bbox_to_tf"/>
+        <arg name="base_frame_name"           value="base_footprint"/>
+        <arg name="bbox_topic_name"           value="/yolov8/objects_rect"/>
+        <arg name="cloud_topic_name"          value="$(arg point_cloud_name)"/>
+        <arg name="img_topic_name"            value="$(arg image_topic_name)"/>
+        <arg name="execute_default"           value="true"/>
+        <arg name="cluster_tolerance"         value="0.008"/>
+        <arg name="min_clusterSize"           value="10"/>
+        <arg name="max_lusterSize"            value="2000000"/>
+        <arg name="noise_point_cloud_range"   value="0.03"/>
+        <arg name="rviz"                      value="true"/>
+    </include>
 </launch>

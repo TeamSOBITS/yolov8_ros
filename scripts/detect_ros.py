@@ -34,7 +34,7 @@ class Yolov8Detector:
         self.img_size = [rospy.get_param("~inference_size_w", 1280), rospy.get_param("~inference_size_h", 720)]
 
         #Start Run_control Service
-        self.server = rospy.Service("run_ctrl", RunCtrl, self.run_ctrl_server)
+        self.server = rospy.Service("/yolov8/run_ctr", RunCtrl, self.run_ctrl_server)
 
         #Initialize Subscriber to Image/CompressedImage topic
         input_image_type, input_image_topic, _ = get_topic_type(rospy.get_param("~image_topic_name"), blocking=True)

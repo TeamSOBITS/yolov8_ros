@@ -119,15 +119,21 @@ roslaunch yolov8_ros yolov8_with_tf.launch
 - ROSの画像のみで推論する場合
 ```
 /yolov8/detect_list (sobits_msgs/StringArray): 検出物体一覧
-/yolov8/detect_poses (sobits_msgs/ObjectPoseArray): 検出物体の画像における位置(ピクセル座標)
-/yolov8/objects_rect (sobits_msgs/BoundingBoxes): 検出物体のBBox情報 (xyxyn)
-/yolov8/detect_result (sensor_msgs/Image): 結果画像　to be developed
+/yolov8/detect_poses (sobits_msgs/ObjectPoseArray): 検出物体の画像におけるピクセル座標
+/yolov8/objects_rect (sobits_msgs/BoundingBoxes): 検出物体のBoundingBox情報
+/yolov8/detect_result (sensor_msgs/Image): 結果画像
 ```
 - ROSの画像にTF(3次元情報)もつけて出力する場合
 ```
 /yolov8_bbox_to_tf/object_poses (sobits_msgs/ObjectPoseArray): 物体の3次元座標
 /yolov8_bbox_to_tf/object_cloud (sensor_msgs/PointCloud2): 物体にかかる点群
 ```
+
+### Service Server
+- ROSの画像のみで推論する場合
+/yolov8/run_ctr (sobits_msgs/RunCtrl): 推論のON/OFFを切り替える(True/False)
+- ROSの画像にTF(3次元情報)もつけて出力する場合
+/yolov8_bbox_to_tf/run_ctr (sobits_msgs/RunCtrl): 3次元化(TF化)のON/OFFを切り替える(True/False)
 
 ### Scripts
 ```

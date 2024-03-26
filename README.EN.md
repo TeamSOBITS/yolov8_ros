@@ -118,14 +118,20 @@ roslaunch yolov8_ros yolov8_with_tf.launch
 ```
 /yolov8/detect_list (sobits_msgs/StringArray): a list of detected objects
 /yolov8/detect_poses (sobits_msgs/ObjectPoseArray): the location of the objects in Image
-/yolov8/objects_rect (sobits_msgs/BoundingBoxes): information of Bounding boxes of the objects (xyxyn)
-/yolov8/detect_result (sensor_msgs/Image): the result image: TBD
+/yolov8/objects_rect (sobits_msgs/BoundingBoxes): information of Bounding boxes of the objects
+/yolov8/detect_result (sensor_msgs/Image): the result image
 ```
 - with tf
 ```
 /yolov8_bbox_to_tf/object_poses (sobits_msgs/ObjectPoseArray): the location of the objects in 3D
 /yolov8_bbox_to_tf/object_cloud (sensor_msgs/PointCloud2): point cloud of object
 ```
+
+### Service Server
+- only Image
+/yolov8/run_ctr (sobits_msgs/RunCtrl): Switching Inference(True/False)
+- with tf
+/yolov8_bbox_to_tf/run_ctr (sobits_msgs/RunCtrl): With 3D(to TF) (True/False)
 
 ### Scripts
 ```

@@ -44,7 +44,7 @@
 <!-- YOLOv8のROS用パッケージ -->
 The ROS package for YOLOv8
 <!-- /usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。 -->
-the package performs the inference with YOLOv8, and publishes the sensor_msgs/Image type message to the /usb_cam/image_raw topic. the published topic and some settings are changeable on launch file.
+Subscribe to image data of sensor_msgs/Image type to infer object detection by YOLOv8.
 
 * yolov8 gihub: https://github.com/ultralytics/ultralytics
 * yolov8Docs:https://docs.ultralytics.com/
@@ -59,32 +59,37 @@ the package performs the inference with YOLOv8, and publishes the sensor_msgs/Im
 <!-- ここで，本レポジトリのセットアップ方法について説明してください． -->
 
 ### Requirements
-* Ubuntu: 20.04
-* ROS: Noetic
-* Python: >=3.7
-* Pytorch: >=1.7
+| System  | Version |
+| ------------- | ------------- |
+| Ubuntu | 20.04 (Focal Fossa) |
+| ROS | Noetic Ninjemys |
+| Python | 3.7~ |
+| Pytorch | 1.7~ |c
 
 ### Installation
 
-<!-- 1. pipよりultralyticsとrequirementsをインストール -->
-1. Install "ultralytics" from pip.
-```
-pip install ultralytics
-```
-
-<!-- 2. TeamSOBITS/yolov8_rosのインストール -->
+1. Change directory
+  ```sh
+  $ cd　~/catkin_ws/src/
+  ```
 2. clone TeamSOBITS/yolov8_ros
-
-```
-cd ~/catkin_ws/src
-git clone https://github.com/TeamSOBITS/yolov8_ros.git -b master
-```
-
-<!-- 3. TeamSOBITS/sobits_msgsをインストール -->
-3. clone TeamSOBITS/objects_msgs
-```
-git clone https://github.com/TeamSOBITS/sobits_msgs.git
-```
+  ```
+  cd ~/catkin_ws/src
+  git clone https://github.com/TeamSOBITS/yolov8_ros.git -b master
+  ```
+3. Change directory
+  ```sh
+  $ cd yolov8_ros
+  ```
+4. Install dependent packages
+  ```sh
+  $ bash install.sh
+  ```
+5. compile
+   ```sh
+   $ cd ~/catkin_ws/
+   $ catkin_make
+   ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -94,22 +99,34 @@ git clone https://github.com/TeamSOBITS/sobits_msgs.git
 
 <!-- デモの実行方法やスクリーンショットがあるとわかりやすくなるでしょう -->
 YOLOv8
+- only Image
 ```
 roslaunch yolov8_ros yolov8.launch
 ```
+> [!NOTE]
+> Replace weights and image_topic_name in the launch" file with the topical name of the weight file or camera to be used.
 
+- with TF
+```
+roslaunch yolov8_ros yolov8_with_tf.launch
+```
+> [!NOTE]
+> And, the point cloud name point_cloud_name is rewritten to the Topic name of the camera to make it 3D.
 
 ### Published Topics
+- only Image
 ```
-detect_list (sobits_msgs/StringArray): a list of detected objects
-detect_poses (sobits_msgs/ObjectPoseArray): the location of the objects
-output_topic (sobits_msgs/BoundingBoxes): information of Bounding boxes of the objects (xyxyn)
-detect_result (sensor_msgs/Image): the result image: TBD
+/yolov8/detect_list (sobits_msgs/StringArray): a list of detected objects
+/yolov8/detect_poses (sobits_msgs/ObjectPoseArray): the location of the objects in Image
+/yolov8/objects_rect (sobits_msgs/BoundingBoxes): information of Bounding boxes of the objects (xyxyn)
+/yolov8/detect_result (sensor_msgs/Image): the result image: TBD
 ```
-### Subscribed Topics
+- with tf
 ```
-/usb_cam/image_raw (sensor_msgs/Image): the input image to YOLOv8
+/yolov8_bbox_to_tf/object_poses (sobits_msgs/ObjectPoseArray): the location of the objects in 3D
+/yolov8_bbox_to_tf/object_cloud (sensor_msgs/PointCloud2): point cloud of object
 ```
+
 ### Scripts
 ```
 detect_ros.py: YOLOv8 inference code
@@ -120,96 +137,13 @@ train_yolov8.py: do the learning by YOLOv8: you must make a dataset, run the cod
 ```
 
 ### sobits_msgs
-<!-- yolov8_rosはBoundingBoxの処理に独自のmsgとsrvを使用します． -->
-yolov8_ros requires TeamSOBITS's msg and srv.
-1.  `BoundingBox.msg` : includes a bounding box information.
-    ```yaml
-    string  Class
-    float64 probability
-    int32   xmin
-    int32   ymin
-    int32   xmax
-    int32   ymax
-    ```
 
-> [!WARNING]
-<!-- > `BoundingBox.msg`は今後廃止状態（deprecated）になる予定です． -->
-> `BoundingBox.msg` will be deprecated soon.
-
-2.  `BoundingBoxes.msg` : includes some BoundingBox.msg as a array
-    ```yaml
-    Header header
-    BoundingBox[] bounding_boxes
-    ```
-
-> [!WARNING]
-> `BoundingBoxes.msg` will be deprecated soon.
-
-3.  `ObjectPose.msg` : includes 3D information of a detected object.
-    ```yaml
-    string Class
-    geometry_msgs/Pose pose
-    int32 detect_id
-    ```
-
-> [!WARNING]
-> `ObjectPose.msg` will be deprecated soon.
-
-4.  `ObjectPoseArray.msg` : includes an array of ObjectPose.msg
-    ```yaml
-    Header header
-    ObjectPose[] object_poses
-    ```
-
-> [!WARNING]
-> `ObjectPoseArray.msg` will be deprecated soon.
-
-5.  `StringArray.msg` : includes an array of String data.
-    ```yaml
-    Header header
-    string[] data
-    ```
-
-6.  `RunCtrl.srv` : controls an execution of yolov8_ros inference.
-    ```yaml
-    bool request
-    ---
-    bool response
-    ```
-
+sobits_msgs is a unique SOBITS message type.\
+BoundingBox, etc., which also includes the detection result and Class name.\
 the detail of sobits_msgs available at [TeamSOBTIS/sobits_msgs](https://github.com/TeamSOBITS/sobits_msgs)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- マイルストーン -->
-## Milestone
-
-- [x] write README.en.md: in progress
-- [ ] make the rate of publishment controllable
-
-Issues page available at [Issueページ](https://github.com/TeamSOBITS/yolov8_ros/issues)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- 変更履歴 -->
-## Change-Log
-
-<!-- - 2.0: 代表的なタイトル
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3
-- 1.1: 代表的なタイトル
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3
-- 1.0: 代表的なタイトル
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3 -->
 
 <!-- CONTRIBUTING -->
 <!-- ## Contributing
@@ -243,7 +177,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 * [YOLOv8](https://github.com/ultralytics/ultralytics)
 * [YOLOv8 Docs](https://docs.ultralytics.com/)
-* []()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -58,10 +58,12 @@ YOLOv8のROS用パッケージ
 ここで，本レポジトリのセットアップ方法について説明してください．
 
 ### 環境条件
-* Ubuntu: 20.04
-* ROS: Noetic
-* Python: >=3.7
-* Pytorch: >=1.7
+| System  | Version |
+| ------------- | ------------- |
+| Ubuntu | 20.04 (Focal Fossa) |
+| ROS | Noetic Ninjemys |
+| Python | 3.7~ |
+| Pytorch | 1.7~ |
 
 ### インストール方法
 

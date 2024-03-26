@@ -65,22 +65,29 @@ YOLOv8のROS用パッケージ
 
 ### インストール方法
 
-1. pipよりultralyticsとrequirementsをインストール
-```
-pip install ultralytics
-```
 
-2. TeamSOBITS/yolov8_rosのインストール
+1. ROSの`src`フォルダに移動します．
+   ```sh
+   $ cd　~/catkin_ws/src/
+   ```
+2. 本レポジトリをcloneします．
+   ```sh
+   $ git clone https://github.com/TeamSOBITS/yolov8_ros.git
+   ```
+3. レポジトリの中へ移動します．
+   ```sh
+   $ cd yolov8_ros
+   ```
+4. 依存パッケージをインストールします．
+    ```sh
+    $ bash install.sh
+    ```
+5. パッケージをコンパイルします．
+   ```sh
+   $ cd ~/catkin_ws/
+   $ catkin_make
+   ```
 
-```
-cd ~/catkin_ws/src
-git clone https://github.com/TeamSOBITS/yolov8_ros.git -b master
-```
-
-3. TeamSOBITS/sobits_msgsをインストール
-```
-git clone https://github.com/TeamSOBITS/sobits_msgs.git
-```
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 

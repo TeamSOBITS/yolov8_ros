@@ -75,8 +75,10 @@ class Yolov8Detector:
                 self.names = self.result[0].names #All label list
 
                 #Fill BoundingBox Messages
+                detect_list = StringArray()
                 detect_poses = ObjectPoseArray()
                 bounding_boxes = BoundingBoxes()
+                detect_list.header = self.img.header
                 detect_poses.header = self.img.header
                 bounding_boxes.header = self.img.header
                 img_result_img = self.img
@@ -92,11 +94,8 @@ class Yolov8Detector:
                     bounding_box.xmax = int(box.xyxy[0][2]) #Xmax NOT normalized 0-1
                     bounding_box.ymax = int(box.xyxy[0][3]) #Ymax NOT normalized 0-1
                     
-                    bounding_boxes.bounding_boxes.append(deepcopy(bounding_box))
                     #Fill detect_list
-                    detect_list = StringArray()
                     label = f"{bounding_box.Class} {bounding_box.probability:.2f}"
-                    detect_list.data.append(deepcopy(label))
                     
                     #generate result image
                     img_result = cv_array
@@ -133,7 +132,9 @@ class Yolov8Detector:
                     obj_pose.pose.position.x = bounding_box.xmin + int((bounding_box.xmax - bounding_box.xmin) / 2)
                     obj_pose.pose.position.y = bounding_box.ymin + int((bounding_box.ymax - bounding_box.ymin) / 2)
                     obj_pose.pose.position.z = -1
+                    detect_list.data.append(deepcopy(label))
                     detect_poses.object_poses.append(deepcopy(obj_pose))
+                    bounding_boxes.bounding_boxes.append(deepcopy(bounding_box))
 
                 self.pub_prediction.publish(bounding_boxes)
                 try:

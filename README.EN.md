@@ -8,7 +8,7 @@
 [![Issues][issues-shield]][issues-url]
 <!-- [![MIT License][license-shield]][license-url] -->
 
-# レポジトリ名
+# YOLOv8 ROS
 
 <!-- 目次 -->
 <details>
@@ -41,9 +41,7 @@
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 [![How to Train Ultralytics YOLOv8 models on Your Custom Dataset in Google Colab](https://img.youtube.com/vi/LNwODJXcvt4/0.jpg)](https://www.youtube.com/watch?v=LNwODJXcvt4)
 
-<!-- YOLOv8のROS用パッケージ -->
 The ROS package for YOLOv8
-<!-- /usb_cam/image_rawトピックにsensor_msgs/Image型の画像データを配信することでYOLOv8による推論を行います。 -->
 Subscribe to image data of sensor_msgs/Image type to infer object detection by YOLOv8.
 
 * yolov8 gihub: https://github.com/ultralytics/ultralytics
@@ -53,10 +51,10 @@ Subscribe to image data of sensor_msgs/Image type to infer object detection by Y
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-
 <!-- セットアップ -->
 ## Getting Started
-<!-- ここで，本レポジトリのセットアップ方法について説明してください． -->
+
+
 
 ### Requirements
 | System  | Version |
@@ -64,7 +62,7 @@ Subscribe to image data of sensor_msgs/Image type to infer object detection by Y
 | Ubuntu | 20.04 (Focal Fossa) |
 | ROS | Noetic Ninjemys |
 | Python | 3.7~ |
-| Pytorch | 1.7~ |c
+| Pytorch | 1.7~ |
 
 ### Installation
 
@@ -74,8 +72,7 @@ Subscribe to image data of sensor_msgs/Image type to infer object detection by Y
   ```
 2. clone TeamSOBITS/yolov8_ros
   ```
-  cd ~/catkin_ws/src
-  git clone https://github.com/TeamSOBITS/yolov8_ros.git -b master
+  git clone https://github.com/TeamSOBITS/yolov8_ros.git
   ```
 3. Change directory
   ```sh
@@ -91,7 +88,6 @@ Subscribe to image data of sensor_msgs/Image type to infer object detection by Y
    $ catkin_make
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- 実行・操作方法 -->
@@ -112,6 +108,8 @@ roslaunch yolov8_ros yolov8_with_tf.launch
 ```
 > [!NOTE]
 > And, the point cloud name point_cloud_name is rewritten to the Topic name of the camera to make it 3D.
+
+
 
 ### Published Topics
 - only Image
@@ -140,13 +138,12 @@ roslaunch yolov8_ros yolov8_with_tf.launch
 ### Scripts
 ```
 detect_ros.py: YOLOv8 inference code
-
 pub_usb_cam.py: the debug code (publishes PC Cam as Image type message)
 publish_image.py: the debug code (publishes a image by press Enter)
 train_yolov8.py: do the learning by YOLOv8: you must make a dataset, run the code with the path to your dataset. the learning is executed by epoch=500, batch=4, imagesize=640.
 ```
 
-### sobits_msgs
+### What is sobits_msgs
 
 sobits_msgs is a unique SOBITS message type.\
 BoundingBox, etc., which also includes the detection result and Class name.\

@@ -8,7 +8,7 @@
 [![Issues][issues-shield]][issues-url]
 <!-- [![MIT License][license-shield]][license-url] -->
 
-# レポジトリ名
+# YOLOv8 ROS
 
 <!-- 目次 -->
 <details>
@@ -18,7 +18,7 @@
       <a href="#概要">概要</a>
     </li>
     <li>
-      <a href="#環境構築">環境構築</a>
+      <a href="#セットアップ">セットアップ</a>
       <ul>
         <li><a href="#環境条件">環境条件</a></li>
         <li><a href="#インストール方法">インストール方法</a></li>
@@ -51,7 +51,6 @@ sensor_msgs/Image型の画像データをSubscribeすることでYOLOv8による
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
-
 <!-- セットアップ -->
 ## セットアップ
 
@@ -66,7 +65,6 @@ sensor_msgs/Image型の画像データをSubscribeすることでYOLOv8による
 | Pytorch | 1.7~ |
 
 ### インストール方法
-
 
 1. ROSの`src`フォルダに移動します．
    ```sh
@@ -89,9 +87,7 @@ sensor_msgs/Image型の画像データをSubscribeすることでYOLOv8による
    $ cd ~/catkin_ws/
    $ catkin_make
    ```
-
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
-
 
 
 <!-- 実行・操作方法 -->
@@ -154,9 +150,6 @@ sobits_msgsは，SOBITSの独自のメッセージ型です．\
 sobits_msgsの詳細について，[TeamSOBTIS/sobits_msgs](https://github.com/TeamSOBITS/sobits_msgs) をご覧ください．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
-
-
-<p align="right">(<a href="#readme-top">上に</a>)</p>
 
 
 <!-- CONTRIBUTING -->

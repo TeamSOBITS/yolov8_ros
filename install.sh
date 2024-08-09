@@ -6,9 +6,9 @@ sudo apt-get update
 
 pip3 install ultralytics
 
-cd ~/catkin_ws/src/
+cd ~/colcon_ws/src/
 
-git clone https://github.com/TeamSOBITS/bbox_to_tf.git
+git clone -b feature/humble-devel https://github.com/TeamSOBITS/bbox_to_tf.git
 
 
 echo "╚══╣ Install: YOLO v8 ROS (FINISHED) ╠══╝"

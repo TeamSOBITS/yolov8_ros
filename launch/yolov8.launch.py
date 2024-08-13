@@ -49,7 +49,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'image_topic_name',
             # default_value='/rgb/image_raw',
-            default_value='/camera/camera/color/image_raw',
+            # default_value='/camera/camera/color/image_raw',
+            default_value='/camera/camera/color/image_rect_raw',
             description='Image topic name'
         ),
 

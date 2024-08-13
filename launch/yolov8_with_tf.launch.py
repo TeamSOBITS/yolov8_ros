@@ -12,7 +12,8 @@ def generate_launch_description():
             'weights',
             default_value=os.path.join(
                 os.getenv('HOME'),
-                'yolov8_ros/scripts/weights/azure_rcjp2022_500_v8n/best.pt'
+                # 'colcon_ws/src/yolov8_ros/scripts/weights/azure_rcjp2022_500_v8n/best.pt'
+                'colcon_ws/src/yolov8_ros/weights/opl_objects.pt'
             ),
             description='Path to the YOLOv8 weights file'
         ),
@@ -33,7 +34,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'view_image',
-            default_value='false',
+            default_value='true',
             description='Visualize using OpenCV window'
         ),
         DeclareLaunchArgument(
@@ -48,13 +49,10 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'image_topic_name',
-            default_value='/rgb/image_raw',
+            # default_value='/rgb/image_raw',
+            # default_value='/camera/camera/color/image_raw',
+            default_value='/camera/camera/color/image_rect_raw',
             description='Image topic name'
-        ),
-        DeclareLaunchArgument(
-            'point_cloud_name',
-            default_value='/points2',
-            description='Point cloud topic name'
         ),
 
         # YOLOv8 Node
@@ -81,21 +79,21 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([
                 os.path.join(
                     os.getenv('HOME'),
-                    'bbox_to_tf/launch/bbox_to_tf.launch.py'
+                    'colcon_ws/src/bbox_to_tf/launch/bbox_to_tf.launch.py'
                 )
             ]),
             launch_arguments={
                 'node_name': 'yolov8_bbox_to_tf',
                 'base_frame_name': 'base_footprint',
                 'bbox_topic_name': '/yolov8/objects_rect',
-                'cloud_topic_name': LaunchConfiguration('point_cloud_name'),
+                'cloud_topic_name': '/camera/camera/depth/color/points',
                 'img_topic_name': LaunchConfiguration('image_topic_name'),
-                'execute_default': 'true',
+                'execute_default': "true",
                 'cluster_tolerance': '0.008',
                 'min_clusterSize': '10',
                 'max_lusterSize': '2000000',
                 'noise_point_cloud_range': '0.03',
-                'rviz': 'true'
+                # 'rviz': 'True'
             }.items()
         )
     ])

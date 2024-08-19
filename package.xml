@@ -1,25 +1,37 @@
 <?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>yolov8_ros</name>
-  <version>1.0.0</version>
-  <description>The yolov8_ros package</description>
-  
-  <maintainer email="choi.6f@gmail.com">Team SOBITS</maintainer>
-  <license>TODO</license>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="suna2042@todo.todo">suna2042</maintainer>
+  <license>TODO: License declaration</license>
 
-  <!-- Build and exec dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <build_depend>rclcpp</build_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- Build dependencies -->
+  <build_depend>rosidl_default_generators</build_depend>
+  <build_depend>rclpy</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>cv_bridge</build_depend>
-  <build_depend>ament_index_cpp</build_depend>
+  <build_depend>sobits_msgs</build_depend>
 
-  <exec_depend>rclcpp</exec_depend>
+  <!-- Execution dependencies -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <exec_depend>rclpy</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
-  <exec_depend>ament_index_cpp</exec_depend>
+  <exec_depend>sobits_msgs</exec_depend>
+
+  <!-- Member of group -->
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
 
   <export>
     <build_type>ament_cmake</build_type>

@@ -12,7 +12,7 @@ find_package(rclpy REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
-find_package(sobits_msgs REQUIRED)
+find_package(sobits_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 

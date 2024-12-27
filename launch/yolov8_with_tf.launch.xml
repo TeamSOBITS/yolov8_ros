@@ -1,6 +1,8 @@
 <launch>
     <!-- weight file path -->
-    <arg name="weights" default="$(find-pkg-share yolov8_ros)/weights/yolov8m.pt"/>    <!-- change the weight path -->
+    <!-- <arg name="weights" default="yolov10m.pt"/> -->
+    <arg name="weights" default="$(find-pkg-share yolov8_ros)/weights/yolov8m.pt"/>
+    <!-- change the weight path -->
 
     <!-- probability -->
     <arg name="conf" default="0.3"/>
@@ -15,7 +17,7 @@
     <arg name="pub_rate" default="5"/>
 
     <!-- image topic name-->
-    <arg name="image_topic_name" default="/camera/camera/color/image_rect_raw"/>    <!-- change the each camera -->
+    <arg name="image_topic_name" default="/camera/camera/color/image_raw"/>    <!-- change the each camera -->
 
     <node pkg="yolov8_ros" name="yolov8" exec="detect_ros.py" output="screen">
         <param name="weights" value="$(var weights)"/>
@@ -37,7 +39,7 @@
     <!-- <include file="$(find-pkg-share bbox_to_tf)/launch/bbox_to_tf.launch.xml"> -->
     <include file="$(find-pkg-share bbox_to_tf)/launch/bbox_to_tf_fast_shot.launch.xml">
         <arg name="node_name"                 value="yolov8_bbox_to_tf"/>
-        <arg name="base_frame_name"           value="base_footprint"/>
+        <arg name="base_frame_name"           value="camera_depth_optical_frame"/>
         <arg name="bbox_topic_name"           value="/yolov8/objects_rect"/>
         <arg name="cloud_topic_name"          value="$(var point_cloud_name)"/>
         <arg name="img_topic_name"            value="$(var image_topic_name)"/>

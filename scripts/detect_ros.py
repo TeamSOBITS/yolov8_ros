@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import rclpy
+import time
 from rclpy.node import Node
 from ultralytics import YOLO
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
-from sobits_msgs.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
-from sobits_msgs.srv import RunCtrl
+from sobits_interfaces.msg import BoundingBox, BoundingBoxes, StringArray, ObjectPose, ObjectPoseArray
+from sobits_interfaces.srv import RunCtrl
 from ultralytics.utils.plotting import Annotator, colors ###
 from copy import deepcopy
 
@@ -50,7 +51,7 @@ class Yolov8Detector:
 
         self.model = YOLO(self.weight_path)
         self.flag = False
-
+        self.bridge = CvBridge()
         # publisher
         self.inference_loop()
 
@@ -59,9 +60,11 @@ class Yolov8Detector:
         while rclpy.ok():
             if ((self.flag) and (self.can_predict)):
                 #subscribe images and conversion to bgr
-                self.bridge = CvBridge()
-                cv_array = np.ndarray
-                cv_array = self.bridge.imgmsg_to_cv2(self.img, "bgr8")
+                
+                cv_array = self.bridge.imgmsg_to_cv2(self.img)
+                cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
+                # cv_array = np.ndarray
+                # cv_array = self.bridge.imgmsg_to_cv2(self.img, "bgr8")
                 
                 #cv2.imwrite
                 cv2.imwrite("yolov8_image.jpg", cv_array)
@@ -141,6 +144,7 @@ class Yolov8Detector:
                     pass
                 self.pub_result_img.publish(img_result_img)
             rclpy.spin_once(nd, timeout_sec=1/self.rate)
+            time.sleep(1/self.rate)
 
     #RunCtrl Server
     def run_ctrl_server(self, request, response):
